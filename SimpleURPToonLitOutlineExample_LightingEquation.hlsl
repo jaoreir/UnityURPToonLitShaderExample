@@ -77,7 +77,6 @@ half3 ShadeSingleLight(ToonSurfaceData surfaceData, ToonLightingData lightingDat
     // additional light reduce intensity since it is additive
     // return saturate(light.color) * lightAttenuationRGB * (isAdditionalLight ? 0.25 : 1); // Original lighting
 
-    // Edit: softly saturate the diffuse light
     half3 diffuseLight = (isAdditionalLight ? 0.25 : 1);
     // Add specular highlight
     half3 specularLight = ShadeSpecularBlinnPhong(surfaceData.specular, N, L, lightingData.viewDirectionWS);
