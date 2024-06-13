@@ -75,6 +75,7 @@ struct Varyings
 
 // all sampler2D don't need to put inside CBUFFER 
 sampler2D _BaseMap; 
+sampler2D _SpecularMap;
 sampler2D _EmissionMap;
 sampler2D _OcclusionMap;
 sampler2D _OutlineZOffsetMaskTex;
@@ -89,6 +90,13 @@ CBUFFER_START(UnityPerMaterial)
     // base color
     float4  _BaseMap_ST;
     half4   _BaseColor;
+
+    // specular
+    float4  _SpecularMap_ST;
+    half    _SpecularAmount;
+    float   _SpecularPower;
+    half    _SpecularMidPoint;
+    half    _SpecularSoftness;
 
     // alpha
     half    _Cutoff;
@@ -133,6 +141,7 @@ struct ToonSurfaceData
 {
     half3   albedo;
     half    alpha;
+    half4   specular;
     half3   emission;
     half    occlusion;
 };
@@ -243,6 +252,11 @@ half4 GetFinalBaseColor(Varyings input)
 {
     return tex2D(_BaseMap, input.uv) * _BaseColor;
 }
+half4 GetFinalSpecularColor(Varyings input)
+{
+    half4 specular = tex2D(_SpecularMap, input.uv);
+    return specular;
+}
 half3 GetFinalEmissionColor(Varyings input)
 {
     half3 result = 0;
@@ -281,6 +295,7 @@ ToonSurfaceData InitializeSurfaceData(Varyings input)
     float4 baseColorFinal = GetFinalBaseColor(input);
     output.albedo = baseColorFinal.rgb;
     output.alpha = baseColorFinal.a;
+    output.specular = GetFinalSpecularColor(input);
     DoClipTestToTargetAlphaValue(output.alpha);// early exit if possible
 
     // emission

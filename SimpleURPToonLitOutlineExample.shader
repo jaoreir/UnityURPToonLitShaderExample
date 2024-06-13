@@ -189,6 +189,13 @@ Shader "SimpleURPToonLitExample(With Outline)"
         [Toggle(_UseAlphaClipping)]_UseAlphaClipping("Enable?", Float) = 0
         _Cutoff("    Cutoff", Range(0.0, 1.0)) = 0.5
 
+        [Header(Specular)]
+        _SpecularMap("Specular Map", 2D) = "white" {}
+        _SpecularAmount("Specular Amount", Range(0,1)) = 1.0
+        _SpecularPower("Specular Power", Float) = 8.0
+        _SpecularMidPoint("MidPoint", Range(0,1)) = 0.9
+        _SpecularSoftness("Softness", Range(0,1)) = 0.05
+
         [Header(Emission)]
         [Toggle]_UseEmission("Enable?", Float) = 0
         [HDR] _EmissionColor("    Color", Color) = (0,0,0)

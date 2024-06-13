@@ -21,6 +21,28 @@ half3 ShadeGI(ToonSurfaceData surfaceData, ToonLightingData lightingData)
     return averageSH * indirectOcclusion;
 }
 
+
+half3 softsat(half3 x)
+{
+	return step(1.0,x) * ((1.0/-x) - x + 2.0) + x;
+}
+
+half3 ShadeSpecular(ToonSurfaceData surfaceData, ToonLightingData lightingData, Light light, bool isAdditionalLight)
+{
+    half3 lightColor = light.color * light.shadowAttenuation;
+    half4 specular = surfaceData.specular;
+
+    half3 N = lightingData.normalWS;
+    half3 L = light.direction;
+    half3 V = lightingData.viewDirectionWS;
+    half3 H = normalize(V+L);
+
+    float NoH = max(dot(N,H), 0.0);
+    float powered = pow(NoH, _SpecularPower * _SpecularPower);
+    half intensity = smoothstep(_SpecularMidPoint - _SpecularSoftness, _SpecularMidPoint + _SpecularSoftness, powered);
+    return lightColor * specular.rgb * intensity * specular.a * _SpecularAmount;
+}
+
 // Most important part: lighting equation, edit it according to your needs, write whatever you want here, be creative!
 // This function will be used by all direct lights (directional/point/spot)
 half3 ShadeSingleLight(ToonSurfaceData surfaceData, ToonLightingData lightingData, Light light, bool isAdditionalLight)
@@ -55,7 +77,14 @@ half3 ShadeSingleLight(ToonSurfaceData surfaceData, ToonLightingData lightingDat
 
     // saturate() light.color to prevent over bright
     // additional light reduce intensity since it is additive
-    return saturate(light.color) * lightAttenuationRGB * (isAdditionalLight ? 0.25 : 1);
+    // return saturate(light.color) * lightAttenuationRGB * (isAdditionalLight ? 0.25 : 1);
+
+    // Limit brightness more gently using softsat
+    half3 diffuseLight = softsat(light.color * (isAdditionalLight ? 0.25 : 1)) * lightAttenuationRGB;
+
+    half3 specularLight = ShadeSpecular(surfaceData, lightingData, light, isAdditionalLight);
+
+    return diffuseLight + specularLight;
 }
 
 half3 ShadeEmission(ToonSurfaceData surfaceData, ToonLightingData lightingData)
