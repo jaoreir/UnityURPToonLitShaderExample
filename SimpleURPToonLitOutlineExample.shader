@@ -180,6 +180,7 @@ Shader "SimpleURPToonLitExample(With Outline)"
     {
         [Header(High Level Setting)]
         [ToggleUI]_IsFace("Is Face? (face/eye/mouth)", Float) = 0
+        _Cull("__cull", Float) = 2.0
 
         [Header(Base Color)]
         [MainTexture]_BaseMap("Base Map", 2D) = "white" {}
@@ -191,8 +192,8 @@ Shader "SimpleURPToonLitExample(With Outline)"
 
         [Header(Specular)]
         _SpecularMap("Specular Map", 2D) = "white" {}
-        _SpecularAmount("Specular Amount", Range(0,1)) = 1.0
-        _SpecularPower("Specular Power", Float) = 8.0
+        _SpecularAmount("Specular Gain", Range(0,8)) = 1.0
+        _SpecularPower("Specular Power", Range(0,32)) = 8.0
         _SpecularMidPoint("MidPoint", Range(0,1)) = 0.9
         _SpecularSoftness("Softness", Range(0,1)) = 0.05
 
@@ -301,7 +302,7 @@ Shader "SimpleURPToonLitExample(With Outline)"
             // - you can expose these render state to material inspector if needed (see URP's Lit.shader)
             Blend One Zero
             ZWrite On
-            Cull Off
+            Cull[_Cull]
             ZTest LEqual
 
             HLSLPROGRAM
@@ -478,7 +479,7 @@ Shader "SimpleURPToonLitExample(With Outline)"
             ZWrite On // the only goal of this pass is to write depth!
             ZTest LEqual // early exit at Early-Z stage if possible            
             ColorMask 0 // we don't care about color, we just want to write depth in shadow maps, ColorMask 0 will save some write bandwidth
-            Cull Off
+            Cull[_Cull]
 
             HLSLPROGRAM
             #pragma target 2.0
@@ -536,7 +537,7 @@ Shader "SimpleURPToonLitExample(With Outline)"
             ZWrite On // the only goal of this pass is to write depth!
             ZTest LEqual // early exit at Early-Z stage if possible            
             ColorMask R // we don't care about RGB color, we just want to write depth, ColorMask R will save some write bandwidth
-            Cull Off 
+            Cull[_Cull]
             
             HLSLPROGRAM
             #pragma target 2.0
@@ -590,7 +591,7 @@ Shader "SimpleURPToonLitExample(With Outline)"
             ZWrite On // the only goal of this pass is to write depth!
             ZTest LEqual // early exit at Early-Z stage if possible            
             ColorMask RGBA // we want to draw normal as rgb color!
-            Cull Off
+            Cull[_Cull]
 
             HLSLPROGRAM
             #pragma target 2.0

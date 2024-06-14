@@ -38,7 +38,7 @@ half3 ShadeSpecularBlinnPhong(half4 specular, half3 normal, half3 lightDirection
     // Then we toon shade the highlight
     half intensity = smoothstep(_SpecularMidPoint - _SpecularSoftness, _SpecularMidPoint + _SpecularSoftness, powered);
     
-    return specular.rgb * specular.a * intensity * _SpecularAmount;
+    return specular.rgb * specular.a * intensity * _SpecularAmount * _SpecularAmount;
 }
 
 // Most important part: lighting equation, edit it according to your needs, write whatever you want here, be creative!
